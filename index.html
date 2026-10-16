@@ -1,0 +1,78 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Letter Traffic – Dr. Kelly's Class</title><style>
+html,body{margin:0;height:100%;overflow:hidden;touch-action:none;font-family:"Arial Rounded MT Bold","Trebuchet MS",Verdana,sans-serif;background:#1ad1c4}
+canvas{display:block;width:100vw;height:100vh}
+#setup{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;background:repeating-linear-gradient(45deg,#7b2ff7 0 30px,#8f45ff 30px 60px)}
+#setup h1{margin:0;font-size:46px;color:#ffe600;text-shadow:4px 4px 0 #ff2e9a,8px 8px 0 #00c2b8;text-align:center;line-height:1.05;transform:rotate(-4deg)}
+#ban{background:#ff2e9a;color:#fff;font-size:26px;font-weight:bold;padding:8px 24px;border:5px solid #ffe600;border-radius:16px;transform:rotate(3deg);box-shadow:5px 5px 0 #00c2b8}
+#setup p{color:#fff;font-size:20px;margin:0;font-weight:bold}
+#nm{font-size:36px;font-weight:bold;font-family:inherit;width:78vw;max-width:420px;padding:14px;border:6px solid #ff2e9a;border-radius:22px;text-align:center;text-transform:uppercase;background:#fff8c0;color:#5a00b0;box-sizing:border-box}
+#go{font-family:inherit;font-size:34px;font-weight:bold;padding:16px 56px;border:6px solid #fff;border-radius:40px;background:#ff8a00;color:#fff;box-shadow:6px 6px 0 #00c2b8}
+#gear{position:fixed;right:10px;bottom:10px;font-size:26px;width:50px;height:50px;border-radius:50%;border:4px solid #fff;background:#7b2ff7;color:#fff;display:none}
+</style></head><body>
+<canvas id="c"></canvas>
+<div id="setup"><div id="ban">⭐ Dr. Kelly's Class ⭐</div><h1>LETTER<br>TRAFFIC!</h1><p>Teacher: type the child's name</p><input id="nm" maxlength="12" autocomplete="off" placeholder="NAME"><button id="go">START ▶</button></div>
+<button id="gear" title="Change name">⚙</button>
+<script>
+const c=document.getElementById('c'),x=c.getContext('2d');let W,H,S,DPR;
+function rs(){DPR=devicePixelRatio||1;W=c.width=innerWidth*DPR;H=c.height=innerHeight*DPR;S=Math.min(W/400,H/800)}addEventListener('resize',rs);rs();
+const F='"Arial Rounded MT Bold",Verdana,sans-serif';
+const WORDS=[['CAT','🐱'],['DOG','🐶'],['SUN','☀️'],['HAT','🎩'],['BUS','🚌'],['RED','🔴'],['BIG','🐘'],['MOM','👩'],['DAD','👨'],['THE',''],['AND',''],['SEE','👀'],['RUN','🏃'],['FUN','🎉'],['PIG','🐷'],['BED','🛏️'],['CUP','🥤'],['MAP','🗺️'],['HEN','🐔'],['BAT','🦇'],['FOX','🦊'],['BUG','🐛']];
+const CC=['#ff2e9a','#ffe600','#00c2b8','#ff8a00','#7b2ff7','#33d17a'];
+let name='',word='',emoji='',idx=0,cars=[],fly=[],conf=[],state='setup',celebT=0,spawnT=0,wi=0,msg='',msg2='',t=0,sinceNeed=0;
+const sq=[...Array(14)].map(()=>({x:Math.random(),y:Math.random()*.06+.22*0,k:Math.floor(Math.random()*3),c:CC[Math.floor(Math.random()*6)],r:Math.random()*6}));
+let ac;function A(){ac=ac||new(window.AudioContext||webkitAudioContext)();if(ac.state=='suspended')ac.resume();return ac}
+function tone(f,t0,d,type,g,f2){const a=A(),o=a.createOscillator(),v=a.createGain(),n=a.currentTime+t0;o.type=type;o.frequency.setValueAtTime(f,n);if(f2)o.frequency.exponentialRampToValueAtTime(f2,n+d);v.gain.setValueAtTime(g,n);v.gain.exponentialRampToValueAtTime(.001,n+d);o.connect(v);v.connect(a.destination);o.start(n);o.stop(n+d)}
+function boing(){try{tone(300,0,.4,'sine',.3,90);tone(500,.05,.25,'triangle',.1,200)}catch(e){}}
+function ding(){try{[523,659,784].forEach((f,i)=>tone(f,i*.07,.25,'square',.08))}catch(e){}}
+function fanfare(){try{[523,659,784,1047,784,1047].forEach((f,i)=>tone(f,i*.12,.3,'square',.08))}catch(e){}}
+function say(s){try{const u=new SpeechSynthesisUtterance(s.toLowerCase());u.rate=.8;speechSynthesis.cancel();speechSynthesis.speak(u)}catch(e){}}
+function setWord(w,e){word=w;emoji=e||'';idx=0;cars=[];sinceNeed=0;say(w)}
+function start(){name=(document.getElementById('nm').value||'').toUpperCase().replace(/[^A-Z]/g,'');if(!name)return;localStorage.setItem('ltName',name);A();
+document.getElementById('setup').style.display='none';document.getElementById('gear').style.display='block';state='play';wi=0;msg='Spell your name!';setWord(name,'⭐')}
+document.getElementById('go').onclick=start;document.getElementById('nm').onkeydown=e=>{if(e.key=='Enter')start()};
+document.getElementById('nm').value=localStorage.getItem('ltName')||'';
+document.getElementById('gear').onclick=e=>{e.stopPropagation();state='setup';document.getElementById('setup').style.display='flex';document.getElementById('gear').style.display='none'};
+function lanes(){const top=H*.5,bot=H*.95,h=(bot-top)/4;return[0,1,2,3].map(i=>top+h*(i+.75))}
+function spawn(){const L=lanes(),li=Math.floor(Math.random()*4);if(cars.some(k=>k.l==li&&k.x>W-150*S))return;
+const need=word[idx];let ch;if(sinceNeed>=2||Math.random()<.4){ch=need;sinceNeed=0}else{ch=String.fromCharCode(65+Math.floor(Math.random()*26));if(ch==need)sinceNeed=0;else sinceNeed++}
+cars.push({x:W+70*S,l:li,y:L[li],ch,col:CC[Math.floor(Math.random()*6)],bus:Math.random()<.35,sp:(.9+Math.random()*.4)*S,wob:Math.random()*6})}
+c.addEventListener('pointerdown',e=>{e.preventDefault();if(state!='play')return;A();const px=e.clientX*DPR,py=e.clientY*DPR;
+let hit=null,bd=1e9;for(const k of cars){const d=Math.hypot(k.x-px,k.y-40*S-py);if(d<75*S&&d<bd){bd=d;hit=k}}if(!hit)return;
+if(hit.ch==word[idx]){ding();const sl=slotPos(idx);fly.push({ch:hit.ch,x:hit.x,y:hit.y-60*S,tx:sl.x,ty:sl.y,p:0,col:hit.col,i:idx});cars=cars.filter(k=>k!=hit);idx++;
+if(idx>=word.length){state='celeb';celebT=0;fanfare();for(let i=0;i<150;i++)conf.push({x:Math.random()*W,y:-Math.random()*H*.5,vx:(Math.random()-.5)*3*S,vy:(2+Math.random()*3)*S,c:CC[i%6],r:Math.random()*6,s:(6+Math.random()*8)*S});
+msg=word==name&&wi==0?'You spelled your name!':'You spelled '+word+'!';msg2="Way to go, Dr. Kelly's Class!";setTimeout(()=>say(msg.replace('!','')),700)}}else{boing();hit.shake=20}},{passive:false});
+function slotPos(i){const n=word.length,sw=Math.min(70*S,W*.9/n);return{x:W/2-sw*n/2+sw*(i+.5),y:H*.13,w:sw}}
+function rr(X,Y,w,h,r){x.beginPath();x.roundRect(X,Y,w,h,r)}
+function T(s,X,Y,sz,col){x.font=`900 ${sz}px ${F}`;x.textAlign='center';x.textBaseline='middle';x.fillStyle=col;x.fillText(s,X,Y,W*.94)}
+function bg(){x.fillStyle='#1ad1c4';x.fillRect(0,0,W,H);
+for(const s of sq){x.save();x.translate(s.x*W,H*(.22+s.y));x.rotate(s.r+t*.003);x.strokeStyle=x.fillStyle=s.c;x.lineWidth=5*S;
+if(s.k==0){x.beginPath();x.moveTo(0,-12*S);x.lineTo(12*S,10*S);x.lineTo(-12*S,10*S);x.fill()}else if(s.k==1){x.beginPath();for(let i=0;i<5;i++)x.lineTo(i*8*S,(i%2?-8:8)*S);x.stroke()}else{x.beginPath();x.moveTo(-15*S,0);x.bezierCurveTo(-5*S,-15*S,5*S,15*S,15*S,0);x.stroke()}x.restore()}
+const sy=H*.31,sh=H*.16;x.fillStyle='#ff8a00';x.fillRect(W*.06,sy,W*.88,sh);x.fillStyle='#ff2e9a';x.beginPath();x.moveTo(W*.02,sy);x.lineTo(W/2,sy-H*.05);x.lineTo(W*.98,sy);x.fill();
+for(const wx of[W*.1,W*.74]){x.fillStyle='#7ff9ff';x.strokeStyle='#5a00b0';x.lineWidth=4*S;rr(wx,sy+sh*.4,W*.16,sh*.45,8*S);x.fill();x.stroke()}
+x.fillStyle='#7b2ff7';rr(W*.43,sy+sh*.45,W*.14,sh*.55,12*S);x.fill();
+x.fillStyle='#5a00b0';rr(W*.08,sy+sh*.05,W*.84,sh*.28,10*S);x.fill();T('FLOYD ELEMENTARY',W/2,sy+sh*.19,Math.min(24*S,W*.055),'#ffe600');
+// Dr Kelly banner on roof
+x.save();x.translate(W/2,sy-H*.012);x.rotate(-.03);x.fillStyle='#ffe600';x.strokeStyle='#ff2e9a';x.lineWidth=4*S;rr(-W*.3,-14*S,W*.6,28*S,8*S);x.fill();x.stroke();T("★ DR. KELLY'S CLASS ★",0,1*S,Math.min(16*S,W*.04),'#5a00b0');x.restore();
+x.fillStyle='#ffe600';x.fillRect(0,sy+sh,W,H*.5-sy-sh);for(let i=0;i<W;i+=30*S){x.fillStyle='#ff2e9a';x.beginPath();x.moveTo(i,sy+sh);x.lineTo(i+15*S,sy+sh+8*S);x.lineTo(i+30*S,sy+sh);x.fill()}
+x.fillStyle='#3a2a5a';x.fillRect(0,H*.5,W,H*.45);const lh=H*.45/4;x.strokeStyle='#ffe600';x.lineWidth=4*S;x.setLineDash([30*S,24*S]);x.lineDashOffset=t*1.5;
+for(let i=1;i<4;i++){x.beginPath();x.moveTo(0,H*.5+lh*i);x.lineTo(W,H*.5+lh*i);x.stroke()}x.setLineDash([]);x.fillStyle='#00c2b8';x.fillRect(0,H*.95,W,H*.05)}
+function car(k){x.save();const sx=k.shake?Math.sin(k.shake)*6*S:0;if(k.shake)k.shake--;x.translate(k.x+sx,k.y+Math.sin(t*.15+k.wob)*2*S);const w=k.bus?120*S:95*S,h=k.bus?50*S:38*S;
+x.fillStyle=k.col;x.strokeStyle='#2a0050';x.lineWidth=4*S;rr(-w/2,-h,w,h*.8,12*S);x.fill();x.stroke();
+x.fillStyle='#7ff9ff';if(!k.bus){x.beginPath();x.moveTo(-w*.3,-h);x.lineTo(-w*.15,-h*1.3);x.lineTo(w*.25,-h*1.3);x.lineTo(w*.35,-h);x.fill();x.stroke()}else for(let i=0;i<3;i++){rr(-w*.42+i*w*.3,-h*.9,w*.2,h*.28,4*S);x.fill()}
+x.strokeStyle='#fff';x.lineWidth=3*S;x.beginPath();for(let i=0;i<8;i++)x.lineTo(-w*.45+i*w*.13,-h*.4+(i%2?-4:4)*S);x.stroke();
+for(const d of[-1,1]){x.fillStyle='#222';x.beginPath();x.arc(d*w*.3,-h*.18,10*S,0,7);x.fill();x.fillStyle='#ffe600';x.beginPath();x.arc(d*w*.3,-h*.18,4*S,0,7);x.fill()}
+const ly=-h*1.3-26*S;x.fillStyle='#fff';x.strokeStyle='#2a0050';x.lineWidth=4*S;x.beginPath();x.arc(0,ly,26*S,0,7);x.fill();x.stroke();T(k.ch,0,ly+2*S,38*S,'#2a0050');x.restore()}
+function hud(){x.fillStyle='rgba(123,47,247,.95)';x.fillRect(0,0,W,H*.2);T((emoji?emoji+'  ':'')+msg,W/2,H*.04,20*S,'#ffe600');
+for(let i=0;i<word.length;i++){const p=slotPos(i);x.fillStyle=i<idx?'#ffe600':'#fff';x.strokeStyle=i==idx&&state=='play'&&t%40<20?'#ff2e9a':'#2a0050';x.lineWidth=5*S;rr(p.x-p.w*.44,p.y-p.w*.5,p.w*.88,p.w,12*S);x.fill();x.stroke();
+if(i<idx&&!fly.some(f=>f.i==i))T(word[i],p.x,p.y+2*S,p.w*.6,'#2a0050')}}
+function step(){t++;bg();if(state!='setup'){
+if(state=='play'&&--spawnT<=0){spawn();spawnT=55+Math.random()*35}
+for(const k of cars)k.x-=k.sp;cars=cars.filter(k=>k.x>-90*S);[...cars].sort((a,b)=>a.l-b.l).forEach(car);hud();
+for(const f of fly){f.p+=.04;const e=1-Math.pow(1-Math.min(1,f.p),3);T(f.ch,f.x+(f.tx-f.x)*e,f.y+(f.ty-f.y)*e-Math.sin(e*Math.PI)*80*S,50*S,f.col)}fly=fly.filter(f=>f.p<1);
+if(state=='celeb'){celebT++;x.save();x.translate(W/2,H*.38);x.rotate(Math.sin(t*.1)*.06);x.fillStyle='#ff2e9a';x.strokeStyle='#ffe600';x.lineWidth=6*S;rr(-W*.45,-55*S,W*.9,110*S,30*S);x.fill();x.stroke();
+T(msg,0,-16*S,Math.min(30*S,W*.065),'#fff');T(msg2,0,26*S,Math.min(18*S,W*.042),'#ffe600');x.restore();
+if(celebT>200){const w=WORDS[wi%WORDS.length];wi++;msg='Spell the word!';setWord(w[0],w[1]);state='play'}}
+for(const p of conf){p.x+=p.vx;p.y+=p.vy;p.r+=.1;x.save();x.translate(p.x,p.y);x.rotate(p.r);x.fillStyle=p.c;x.fillRect(-p.s/2,-p.s/4,p.s,p.s/2);x.restore()}conf=conf.filter(p=>p.y<H)}
+requestAnimationFrame(step)}step();
+</script></body></html>
