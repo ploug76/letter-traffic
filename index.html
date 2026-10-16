@@ -20,10 +20,13 @@ details{background:#fff8c0;border:4px solid #7b2ff7;border-radius:18px;padding:1
 summary{font-size:24px;font-weight:bold;cursor:pointer}details label{display:block;margin:8px 0}details textarea{width:100%;font-size:18px;font-family:inherit;text-transform:uppercase;box-sizing:border-box}
 details select{font-size:18px;padding:4px}.chips span{display:inline-block;background:#33d17a;color:#fff;border-radius:10px;padding:2px 8px;margin:2px;font-size:14px}.chips span.w{background:#ff8a00}
 .del{background:#ff2e9a!important}
+#pin{display:none;background:#2a0050}#pin h2{color:#ffe600;font-size:28px;margin:10px 0 0;text-align:center}#pdots{font-size:48px;color:#fff;letter-spacing:12px}
+#pad{display:grid;grid-template-columns:repeat(3,86px);gap:14px}#pad button{font-family:inherit;font-size:38px;font-weight:bold;height:86px;border-radius:50%;border:5px solid #fff;color:#fff;box-shadow:4px 4px 0 #ff2e9a}
 </style></head><body>
 <canvas id="c"></canvas>
 <div id="home" class="scr"><div id="ban">⭐ Dr. Kelly's Class ⭐</div><h1>LETTER<br>TRAFFIC!</h1><p>Who's playing? Tap your name!</p><div id="kids"></div><p id="empty">Teacher: tap ⚙ Teacher to add your class!</p><button id="inst" class="pill">📲 Install app</button><div id="ioshint">On iPhone/iPad: tap Share ⬆ then “Add to Home Screen”</div><button id="tbtn" class="pill small">⚙ Teacher</button></div>
-<div id="teacher" class="scr"><h2>Teacher Settings</h2><div class="row"><input id="newk" placeholder="NEW NAME" maxlength="12" autocomplete="off"><button id="addk" class="pill">+ Add</button></div><div id="tlist"></div><div class="row"><button id="exp" class="pill small">💾 Export class</button><button id="imp" class="pill small">📂 Import class</button><input type="file" id="impf" accept=".json,application/json" hidden></div><button id="tback" class="pill">✔ Done</button></div>
+<div id="teacher" class="scr"><h2>Teacher Settings</h2><div class="row"><input id="newk" placeholder="NEW NAME" maxlength="12" autocomplete="off"><button id="addk" class="pill">+ Add</button></div><div id="tlist"></div><div class="row"><button id="chpin" class="pill small">🔒 Change PIN</button><button id="exp" class="pill small">💾 Export class</button><button id="imp" class="pill small">📂 Import class</button><input type="file" id="impf" accept=".json,application/json" hidden></div><button id="tback" class="pill">✔ Done</button></div>
+<div id="pin" class="scr"><h2 id="ptitle"></h2><div id="pdots"></div><div id="pad"></div><div class="row"><button id="pforgot" class="pill small">Forgot PIN?</button><button id="pcancel" class="pill small del">✖ Cancel</button></div></div>
 <button id="gear" title="Back to names">⚙</button>
 <script>
 const c=document.getElementById('c'),x=c.getContext('2d');let W,H,S,DPR;
@@ -51,7 +54,7 @@ let kid=null,last='';const SPD={slow:.6,med:1,fast:1.4};
 function mastered(k){return Object.keys(k.prog).filter(w=>k.prog[w]>=2)}
 function nextWord(){let pool=[];SIGHT.forEach(w=>{if(kid.fry[w[2]])pool.push([w,1])});if(kid.pic)CVC.forEach(w=>pool.push([w,0]));kid.custom.forEach(c=>{for(let i=0;i<3;i++)pool.push([[c,''],2])});if(!pool.length)SIGHT.slice(0,25).forEach(w=>pool.push([w,1]));
 let cand=pool.filter(p=>p[0][0]!=last);if(!cand.length)cand=pool;const un=cand.filter(p=>(kid.prog[p[0][0]]||0)<2);if(un.length&&Math.random()<.85)cand=un;const r=cand[Math.floor(Math.random()*cand.length)];last=r[0][0];return r}
-function show(id){['home','teacher'].forEach(k=>$(k).style.display=k==id?'flex':'none');$('gear').style.display=id?'none':'block'}
+function show(id){['home','teacher','pin'].forEach(k=>$(k).style.display=k==id?'flex':'none');$('gear').style.display=id?'none':'block'}
 function renderHome(){const box=$('kids');box.innerHTML='';DB.kids.forEach((k,i)=>{const b=document.createElement('button');b.className='kb';b.style.background=CC[[0,4,3,2,5][i%5]];b.textContent=k.name;const sm=document.createElement('small');sm.textContent='⭐ '+k.stars+' · '+mastered(k).length+' words';b.appendChild(sm);b.onclick=()=>start(k);box.appendChild(b)});$('empty').style.display=DB.kids.length?'none':'block'}
 function goHome(){state='setup';cars=[];conf=[];renderHome();show('home')}
 function start(k){kid=k;name=k.name;last='';A();show(null);state='play';wi=0;msg='Spell your name!';setWord(name,'⭐')}
@@ -65,7 +68,16 @@ q('.cw').onchange=e=>{k.custom=[...new Set(e.target.value.split(/[\s,;]+/).map(c
 q('.sp').onchange=e=>{k.speed=e.target.value;saveDB()};
 q('.rp').onclick=()=>{if(confirm('Reset progress for '+k.name+'?')){k.prog={};k.stars=0;saveDB();renderTeacher()}};
 q('.del').onclick=()=>{if(confirm('Remove '+k.name+' from the class?')){DB.kids=DB.kids.filter(z=>z!=k);saveDB();renderTeacher()}};box.appendChild(d)})}
-$('tbtn').onclick=()=>{renderTeacher();show('teacher')};$('tback').onclick=goHome;
+function hp(p){let h=2166136261;for(const c of 'lt-salt:'+p){h^=c.charCodeAt(0);h=Math.imul(h,16777619)}return(h>>>0).toString(16)}
+let pinMode,pinBuf='',pinFirst='';const PT={enter:'Enter Teacher PIN',set1:'Create a 4-digit Teacher PIN',set2:'Enter the same PIN again'};
+function openPin(m){pinMode=m;pinBuf='';pinFirst='';drawPin();show('pin')}
+function drawPin(err){$('ptitle').textContent=err||PT[pinMode];$('pdots').textContent='●'.repeat(pinBuf.length)+'○'.repeat(4-pinBuf.length);$('pforgot').style.display=pinMode=='enter'?'inline-block':'none'}
+function pinKey(k){if(k=='<'){pinBuf=pinBuf.slice(0,-1);return drawPin()}if(pinBuf.length>=4)return;pinBuf+=k;drawPin();if(pinBuf.length<4)return;const v=pinBuf;
+setTimeout(()=>{pinBuf='';if(pinMode=='enter'){if(hp(v)==DB.pin)openTeacher();else drawPin('Wrong PIN — try again')}else if(pinMode=='set1'){pinFirst=v;pinMode='set2';drawPin()}else if(v==pinFirst){DB.pin=hp(v);saveDB();openTeacher()}else{pinMode='set1';drawPin("PINs didn't match — start again")}},200)}
+['1','2','3','4','5','6','7','8','9','<','0'].forEach((k,i)=>{const b=document.createElement('button');b.textContent=k=='<'?'⌫':k;b.style.background=CC[[0,4,3,2,5][i%5]];b.onclick=()=>pinKey(k);$('pad').appendChild(b)});
+function openTeacher(){renderTeacher();show('teacher')}
+$('tbtn').onclick=()=>openPin(DB.pin?'enter':'set1');$('pcancel').onclick=goHome;$('chpin').onclick=()=>openPin('set1');
+$('pforgot').onclick=()=>{const a=6+Math.floor(Math.random()*7),b=6+Math.floor(Math.random()*7),r=prompt('Grown-up check: what is '+a+' × '+b+'?');if(r===null)return;if(+r==a*b)openPin('set1');else alert('Not quite — try again.')};$('tback').onclick=goHome;
 const addKid=()=>{const n=clean($('newk').value);if(!n)return;DB.kids.push(newKid(n));saveDB();$('newk').value='';renderTeacher()};$('addk').onclick=addKid;$('newk').onkeydown=e=>{if(e.key=='Enter')addKid()};
 $('exp').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(DB,null,1)],{type:'application/json'}));a.download='letter-traffic-class.json';document.body.appendChild(a);a.click();a.remove()};
 $('imp').onclick=()=>$('impf').click();$('impf').onchange=e=>{const f=e.target.files[0];if(!f)return;f.text().then(t=>{try{const d=JSON.parse(t);if(!Array.isArray(d.kids))throw 0;
