@@ -43,7 +43,7 @@ function boing(){try{tone(300,0,.4,'sine',.3,90);tone(500,.05,.25,'triangle',.1,
 function ding(){try{[523,659,784].forEach((f,i)=>tone(f,i*.07,.25,'square',.08))}catch(e){}}
 function fanfare(){try{[523,659,784,1047,784,1047].forEach((f,i)=>tone(f,i*.12,.3,'square',.08))}catch(e){}}
 let sayTok=0;function say(s,raw){const my=++sayTok,txt=raw?s:s.toLowerCase();try{speechSynthesis.cancel()}catch(e){}setTimeout(()=>{if(my!=sayTok)return;try{const u=new SpeechSynthesisUtterance(txt);u.lang='en-US';u.rate=.85;speechSynthesis.speak(u)}catch(e){}},40)}
-function letterSay(ch){const l=ch.toLowerCase();return l=='a'?'ay':l}
+function letterSay(ch){const l=ch.toLowerCase();return l=='a'?'a.':l}
 function setWord(w,e){word=w==name?w:w=='I'?'I':w.toLowerCase();emoji=e||'';idx=0;cars=[];sinceNeed=0;say(w)}
 const $=id=>document.getElementById(id);
 function clean(n){return(n||'').toUpperCase().replace(/[^A-Z]/g,'').slice(0,12)}
@@ -101,7 +101,7 @@ if(idx>=word.length){state='celeb';celebT=0;fanfare();for(let i=0;i<150;i++)conf
 msg=word==name&&wi==0?'You spelled your name!':'You spelled '+word+'!';msg2="Way to go, Dr. Kelly's Class!";kid.stars++;if(!(word==name&&wi==0))kid.prog[word.toUpperCase()]=(kid.prog[word.toUpperCase()]||0)+1;saveDB();setTimeout(()=>say(word==name&&wi==0?'You spelled your name, '+name:'You spelled '+word),600)}}else{boing();hit.shake=20}},{passive:false});
 function slotPos(i){const n=word.length,sw=Math.min(70*S,W*.9/n);return{x:W/2-sw*n/2+sw*(i+.5),y:H*.13,w:sw}}
 function rr(X,Y,w,h,r){x.beginPath();x.roundRect(X,Y,w,h,r)}
-function T(s,X,Y,sz,col){x.font=`900 ${sz}px ${F}`;x.textAlign='center';x.textBaseline='middle';x.fillStyle=col;x.fillText(s,X,Y,W*.94)}
+function T(s,X,Y,sz,col){x.font=s==='I'?`bold ${sz}px Georgia,'Times New Roman',serif`:`900 ${sz}px ${F}`;x.textAlign='center';x.textBaseline='middle';x.fillStyle=col;x.fillText(s,X,Y,W*.94)}
 function bg(){x.fillStyle='#1ad1c4';x.fillRect(0,0,W,H);
 for(const s of sq){x.save();x.translate(s.x*W,H*(.22+s.y));x.rotate(s.r+t*.003);x.strokeStyle=x.fillStyle=s.c;x.lineWidth=5*S;
 if(s.k==0){x.beginPath();x.moveTo(0,-12*S);x.lineTo(12*S,10*S);x.lineTo(-12*S,10*S);x.fill()}else if(s.k==1){x.beginPath();for(let i=0;i<5;i++)x.lineTo(i*8*S,(i%2?-8:8)*S);x.stroke()}else{x.beginPath();x.moveTo(-15*S,0);x.bezierCurveTo(-5*S,-15*S,5*S,15*S,15*S,0);x.stroke()}x.restore()}
