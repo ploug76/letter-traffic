@@ -1,6 +1,6 @@
 <!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <link rel="manifest" href="manifest.json"><meta name="theme-color" content="#7b2ff7"><link rel="apple-touch-icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><title>Letter Traffic – Dr. Kelly's Class</title><style>
-html,body{margin:0;height:100%;overflow:hidden;touch-action:none;font-family:"Arial Rounded MT Bold","Trebuchet MS",Verdana,sans-serif;background:#1ad1c4}
+html,body{margin:0;height:100%;overflow:hidden;touch-action:none;font-family:'Andika','Comic Sans MS','Comic Neue','Chalkboard SE','Arial Rounded MT Bold',Verdana,sans-serif;background:#1ad1c4}
 canvas{display:block;width:100vw;height:100vh}
 .scr{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;gap:16px;padding:24px 12px 40px;box-sizing:border-box;overflow-y:auto;background:repeating-linear-gradient(45deg,#7b2ff7 0 30px,#8f45ff 30px 60px)}
 #home h1{margin:0;font-size:46px;color:#ffe600;text-shadow:4px 4px 0 #ff2e9a,8px 8px 0 #00c2b8;text-align:center;line-height:1.05;transform:rotate(-4deg)}
@@ -15,7 +15,7 @@ canvas{display:block;width:100vw;height:100vh}
 .kb{font-family:inherit;min-width:140px;padding:14px 16px;border:5px solid #fff;border-radius:24px;color:#fff;font-size:30px;font-weight:bold;box-shadow:5px 5px 0 #2a0050;text-shadow:2px 2px 0 #2a0050}.kb small{display:block;font-size:16px;margin-top:4px}
 #inst{display:none;background:#33d17a}#ioshint{display:none;color:#fff;background:#2a0050;padding:10px 16px;border-radius:14px;font-size:16px;text-align:center}
 #teacher h2{color:#ffe600;font-size:34px;margin:0;text-shadow:3px 3px 0 #ff2e9a}.row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
-#newk,.ren{font-family:inherit;font-size:24px;font-weight:bold;padding:10px;border:4px solid #ff2e9a;border-radius:16px;text-transform:uppercase;width:200px;background:#fff8c0;color:#5a00b0}
+#newk,.ren{font-family:inherit;font-size:24px;font-weight:bold;padding:10px;border:4px solid #ff2e9a;border-radius:16px;width:200px;background:#fff8c0;color:#5a00b0}
 details{background:#fff8c0;border:4px solid #7b2ff7;border-radius:18px;padding:10px 14px;width:min(92vw,560px);box-sizing:border-box;color:#2a0050;font-size:18px}
 summary{font-size:24px;font-weight:bold;cursor:pointer}details label{display:block;margin:8px 0}details textarea{width:100%;font-size:18px;font-family:inherit;text-transform:uppercase;box-sizing:border-box}
 details select{font-size:18px;padding:4px}.chips span{display:inline-block;background:#33d17a;color:#fff;border-radius:10px;padding:2px 8px;margin:2px;font-size:14px}.chips span.w{background:#ff8a00}
@@ -31,7 +31,7 @@ details select{font-size:18px;padding:4px}.chips span{display:inline-block;backg
 <script>
 const c=document.getElementById('c'),x=c.getContext('2d');let W,H,S,DPR;
 function rs(){DPR=devicePixelRatio||1;W=c.width=innerWidth*DPR;H=c.height=innerHeight*DPR;S=Math.min(W/400,H/800)}addEventListener('resize',rs);rs();
-const F='"Arial Rounded MT Bold",Verdana,sans-serif';
+const F='"Andika","Comic Sans MS","Comic Neue","Chalkboard SE","Arial Rounded MT Bold",Verdana,sans-serif';const cap=n=>n?n[0].toUpperCase()+n.slice(1).toLowerCase():'';
 const SIGHT=[['THE','',0],['OF','',0],['AND','',0],['A','',0],['TO','',0],['IN','',0],['IS','',0],['YOU','',0],['THAT','',0],['IT','',0],['HE','',0],['WAS','',0],['FOR','',0],['ON','',0],['ARE','',0],['AS','',0],['WITH','',0],['HIS','',0],['THEY','',0],['I','',0],['AT','',0],['BE','',0],['THIS','',0],['HAVE','',0],['FROM','',0],['OR','',1],['ONE','1️⃣',1],['HAD','',1],['BY','',1],['WORDS','',1],['BUT','',1],['NOT','',1],['WHAT','',1],['ALL','',1],['WERE','',1],['WE','',1],['WHEN','',1],['YOUR','',1],['CAN','',1],['SAID','',1],['THERE','',1],['USE','',1],['AN','',1],['EACH','',1],['WHICH','',1],['SHE','',1],['DO','',1],['HOW','',1],['THEIR','',1],['IF','',1],['WILL','',2],['UP','',2],['OTHER','',2],['ABOUT','',2],['OUT','',2],['MANY','',2],['THEN','',2],['THEM','',2],['THESE','',2],['SO','',2],['SOME','',2],['HER','',2],['WOULD','',2],['MAKE','',2],['LIKE','',2],['HIM','',2],['INTO','',2],['TIME','⏰',2],['HAS','',2],['LOOK','👀',2],['TWO','2️⃣',2],['MORE','',2],['WRITE','✏️',2],['GO','',2],['SEE','',2],['NUMBER','',3],['NO','',3],['WAY','',3],['COULD','',3],['PEOPLE','',3],['MY','',3],['THAN','',3],['FIRST','',3],['WATER','💧',3],['BEEN','',3],['CALLED','',3],['WHO','',3],['AM','',3],['ITS','',3],['NOW','',3],['FIND','',3],['LONG','',3],['DOWN','',3],['DAY','☀️',3],['DID','',3],['GET','',3],['COME','',3],['MADE','',3],['MAY','',3],['PART','',3]];
 const CVC=[['CAT','🐱'],['DOG','🐶'],['SUN','☀️'],['HAT','🎩'],['BUS','🚌'],['PIG','🐷'],['BED','🛏️'],['CUP','🥤'],['MAP','🗺️'],['HEN','🐔'],['FOX','🦊'],['BUG','🐛']];
 const CC=['#ff2e9a','#ffe600','#00c2b8','#ff8a00','#7b2ff7','#33d17a'];
@@ -43,7 +43,7 @@ function boing(){try{tone(300,0,.4,'sine',.3,90);tone(500,.05,.25,'triangle',.1,
 function ding(){try{[523,659,784].forEach((f,i)=>tone(f,i*.07,.25,'square',.08))}catch(e){}}
 function fanfare(){try{[523,659,784,1047,784,1047].forEach((f,i)=>tone(f,i*.12,.3,'square',.08))}catch(e){}}
 function say(s,raw){try{const u=new SpeechSynthesisUtterance(raw?s:s.toLowerCase());u.rate=.8;speechSynthesis.cancel();speechSynthesis.speak(u)}catch(e){}}
-function setWord(w,e){word=w;emoji=e||'';idx=0;cars=[];sinceNeed=0;say(w)}
+function setWord(w,e){word=w==name?w:w=='I'?'I':w.toLowerCase();emoji=e||'';idx=0;cars=[];sinceNeed=0;say(w)}
 const $=id=>document.getElementById(id);
 function clean(n){return(n||'').toUpperCase().replace(/[^A-Z]/g,'').slice(0,12)}
 function newKid(n){return{id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),name:clean(n),fry:[true,true,false,false],pic:true,custom:[],speed:'med',prog:{},stars:0}}
@@ -55,12 +55,12 @@ function mastered(k){return Object.keys(k.prog).filter(w=>k.prog[w]>=2)}
 function nextWord(){let pool=[];SIGHT.forEach(w=>{if(kid.fry[w[2]])pool.push([w,1])});if(kid.pic)CVC.forEach(w=>pool.push([w,0]));kid.custom.forEach(c=>{for(let i=0;i<3;i++)pool.push([[c,''],2])});if(!pool.length)SIGHT.slice(0,25).forEach(w=>pool.push([w,1]));
 let cand=pool.filter(p=>p[0][0]!=last);if(!cand.length)cand=pool;const un=cand.filter(p=>(kid.prog[p[0][0]]||0)<2);if(un.length&&Math.random()<.85)cand=un;const r=cand[Math.floor(Math.random()*cand.length)];last=r[0][0];return r}
 function show(id){['home','teacher','pin'].forEach(k=>$(k).style.display=k==id?'flex':'none');$('gear').style.display=id?'none':'block'}
-function renderHome(){const box=$('kids');box.innerHTML='';DB.kids.forEach((k,i)=>{const b=document.createElement('button');b.className='kb';b.style.background=CC[[0,4,3,2,5][i%5]];b.textContent=k.name;const sm=document.createElement('small');sm.textContent='⭐ '+k.stars+' · '+mastered(k).length+' words';b.appendChild(sm);b.onclick=()=>start(k);box.appendChild(b)});$('empty').style.display=DB.kids.length?'none':'block'}
+function renderHome(){const box=$('kids');box.innerHTML='';DB.kids.forEach((k,i)=>{const b=document.createElement('button');b.className='kb';b.style.background=CC[[0,4,3,2,5][i%5]];b.textContent=cap(k.name);const sm=document.createElement('small');sm.textContent='⭐ '+k.stars+' · '+mastered(k).length+' words';b.appendChild(sm);b.onclick=()=>start(k);box.appendChild(b)});$('empty').style.display=DB.kids.length?'none':'block'}
 function goHome(){state='setup';cars=[];conf=[];renderHome();show('home')}
-function start(k){kid=k;name=k.name;last='';A();show(null);state='play';wi=0;msg='Spell your name!';setWord(name,'⭐')}
+function start(k){kid=k;name=cap(k.name);last='';A();show(null);state='play';wi=0;msg='Spell your name!';setWord(name,'⭐')}
 function renderTeacher(){const box=$('tlist');box.innerHTML='';DB.kids.forEach(k=>{const d=document.createElement('details');const m=mastered(k);
 d.innerHTML=`<summary></summary><label>Name: <input class="ren" maxlength="12"></label><div><b>Fry Sight Words:</b></div><label><input type="checkbox" class="f0"> Fry 1–25</label><label><input type="checkbox" class="f1"> Fry 26–50</label><label><input type="checkbox" class="f2"> Fry 51–75</label><label><input type="checkbox" class="f3"> Fry 76–100</label><label><input type="checkbox" class="cp"> Picture Words (CAT, DOG…)</label><label>Custom words (separate with spaces or commas):<textarea class="cw" rows="2"></textarea></label><label>Speed: <select class="sp"><option value="slow">Slow</option><option value="med">Medium</option><option value="fast">Fast</option></select></label><div><b>Progress:</b> ⭐ <span class="st"></span> stars · <span class="mc"></span> words mastered (spelled 2×)</div><div class="chips"></div><div class="row" style="margin-top:8px"><button class="pill small rp">↺ Reset progress</button><button class="pill small del">🗑 Remove</button></div>`;
-const q=c=>d.querySelector(c);q('summary').textContent=k.name+'  ⭐'+k.stars;q('.ren').value=k.name;[0,1,2,3].forEach(i=>{const c=q('.f'+i);c.checked=k.fry[i];c.onchange=e=>{k.fry[i]=e.target.checked;saveDB()}});q('.cp').checked=k.pic;q('.cw').value=k.custom.join(' ');q('.sp').value=k.speed;q('.st').textContent=k.stars;q('.mc').textContent=m.length;
+const q=c=>d.querySelector(c);q('summary').textContent=cap(k.name)+'  ⭐'+k.stars;q('.ren').value=cap(k.name);[0,1,2,3].forEach(i=>{const c=q('.f'+i);c.checked=k.fry[i];c.onchange=e=>{k.fry[i]=e.target.checked;saveDB()}});q('.cp').checked=k.pic;q('.cw').value=k.custom.join(' ');q('.sp').value=k.speed;q('.st').textContent=k.stars;q('.mc').textContent=m.length;
 Object.keys(k.prog).sort().forEach(w=>{const s=document.createElement('span');s.textContent=w+(k.prog[w]>=2?' ✓':' ·'+k.prog[w]);if(k.prog[w]<2)s.className='w';q('.chips').appendChild(s)});
 q('.ren').onchange=e=>{const n=clean(e.target.value);if(n){k.name=n;saveDB();renderTeacher()}else e.target.value=k.name};
 q('.cp').onchange=e=>{k.pic=e.target.checked;saveDB()};
@@ -88,13 +88,13 @@ if(/iphone|ipad|ipod/i.test(navigator.userAgent)&&!navigator.standalone)$('ioshi
 if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js');
 function lanes(){const top=H*.5,bot=H*.95,h=(bot-top)/4;return[0,1,2,3].map(i=>top+h*(i+.75))}
 function spawn(){const L=lanes(),li=Math.floor(Math.random()*4);const d=li%2?1:-1,sx=d<0?W+70*S:-70*S;if(cars.some(k=>k.l==li&&Math.abs(k.x-sx)<170*S))return;
-const need=word[idx];let ch;if(sinceNeed>=1||Math.random()<.5){ch=need;sinceNeed=0}else{ch=String.fromCharCode(65+Math.floor(Math.random()*26));if(ch==need)sinceNeed=0;else sinceNeed++}
+const need=word[idx];let ch;if(sinceNeed>=1||Math.random()<.5){ch=need;sinceNeed=0}else{ch=String.fromCharCode((need>='a'?97:65)+Math.floor(Math.random()*26));if(ch==need)sinceNeed=0;else sinceNeed++}
 cars.push({x:sx,d,l:li,y:L[li],ch,col:CC[Math.floor(Math.random()*6)],bus:Math.random()<.35,sp:(1.6+Math.random()*.6)*S*SPD[kid.speed||'med'],wob:Math.random()*6})}
 c.addEventListener('pointerdown',e=>{e.preventDefault();if(state!='play')return;A();const px=e.clientX*DPR,py=e.clientY*DPR;
 let hit=null,bd=1e9;for(const k of cars){const d=Math.hypot(k.x-px,k.y-40*S-py);if(d<95*S&&d<bd){bd=d;hit=k}}if(!hit)return;
-say(hit.ch,1);if(hit.ch==word[idx]){ding();const sl=slotPos(idx);fly.push({ch:hit.ch,x:hit.x,y:hit.y-60*S,tx:sl.x,ty:sl.y,p:0,col:hit.col,i:idx});cars=cars.filter(k=>k!=hit);idx++;
+say(hit.ch.toUpperCase(),1);if(hit.ch==word[idx]){ding();const sl=slotPos(idx);fly.push({ch:hit.ch,x:hit.x,y:hit.y-60*S,tx:sl.x,ty:sl.y,p:0,col:hit.col,i:idx});cars=cars.filter(k=>k!=hit);idx++;
 if(idx>=word.length){state='celeb';celebT=0;fanfare();for(let i=0;i<150;i++)conf.push({x:Math.random()*W,y:-Math.random()*H*.5,vx:(Math.random()-.5)*3*S,vy:(2+Math.random()*3)*S,c:CC[i%6],r:Math.random()*6,s:(6+Math.random()*8)*S});
-msg=word==name&&wi==0?'You spelled your name!':'You spelled '+word+'!';msg2="Way to go, Dr. Kelly's Class!";kid.stars++;if(!(word==name&&wi==0))kid.prog[word]=(kid.prog[word]||0)+1;saveDB();setTimeout(()=>say(word==name&&wi==0?'You spelled your name, '+name:'You spelled '+word),600)}}else{boing();hit.shake=20}},{passive:false});
+msg=word==name&&wi==0?'You spelled your name!':'You spelled '+word+'!';msg2="Way to go, Dr. Kelly's Class!";kid.stars++;if(!(word==name&&wi==0))kid.prog[word.toUpperCase()]=(kid.prog[word.toUpperCase()]||0)+1;saveDB();setTimeout(()=>say(word==name&&wi==0?'You spelled your name, '+name:'You spelled '+word),600)}}else{boing();hit.shake=20}},{passive:false});
 function slotPos(i){const n=word.length,sw=Math.min(70*S,W*.9/n);return{x:W/2-sw*n/2+sw*(i+.5),y:H*.13,w:sw}}
 function rr(X,Y,w,h,r){x.beginPath();x.roundRect(X,Y,w,h,r)}
 function T(s,X,Y,sz,col){x.font=`900 ${sz}px ${F}`;x.textAlign='center';x.textBaseline='middle';x.fillStyle=col;x.fillText(s,X,Y,W*.94)}
