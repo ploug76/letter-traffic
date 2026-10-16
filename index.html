@@ -17,7 +17,9 @@ canvas{display:block;width:100vw;height:100vh}
 const c=document.getElementById('c'),x=c.getContext('2d');let W,H,S,DPR;
 function rs(){DPR=devicePixelRatio||1;W=c.width=innerWidth*DPR;H=c.height=innerHeight*DPR;S=Math.min(W/400,H/800)}addEventListener('resize',rs);rs();
 const F='"Arial Rounded MT Bold",Verdana,sans-serif';
-const WORDS=[['CAT','🐱'],['DOG','🐶'],['SUN','☀️'],['HAT','🎩'],['BUS','🚌'],['RED','🔴'],['BIG','🐘'],['MOM','👩'],['DAD','👨'],['THE',''],['AND',''],['SEE','👀'],['RUN','🏃'],['FUN','🎉'],['PIG','🐷'],['BED','🛏️'],['CUP','🥤'],['MAP','🗺️'],['HEN','🐔'],['BAT','🦇'],['FOX','🦊'],['BUG','🐛']];
+const SIGHT=[['A',''],['AND',''],['AWAY',''],['BIG',''],['BLUE','🔵'],['CAN',''],['COME',''],['DOWN',''],['FIND',''],['FOR',''],['FUNNY',''],['GO',''],['HELP',''],['HERE',''],['I',''],['IN',''],['IS',''],['IT',''],['JUMP',''],['LITTLE',''],['LOOK',''],['MAKE',''],['ME',''],['MY',''],['NOT',''],['ONE','1️⃣'],['PLAY',''],['RED','🔴'],['RUN',''],['SAID',''],['SEE',''],['THE',''],['THREE','3️⃣'],['TO',''],['TWO','2️⃣'],['UP',''],['WE',''],['WHERE',''],['YELLOW','🟡'],['YOU',''],['ALL',''],['AM',''],['ARE',''],['AT',''],['ATE',''],['BE',''],['BLACK','⚫'],['BROWN','🟤'],['BUT',''],['CAME',''],['DID',''],['DO',''],['EAT',''],['FOUR','4️⃣'],['GET',''],['GOOD',''],['HAVE',''],['HE',''],['INTO',''],['LIKE',''],['MUST',''],['NEW',''],['NO',''],['NOW',''],['ON',''],['OUR',''],['OUT',''],['PLEASE',''],['PRETTY',''],['RAN',''],['RIDE',''],['SAW',''],['SAY',''],['SHE',''],['SO',''],['SOON',''],['THAT',''],['THERE',''],['THEY',''],['THIS',''],['TOO',''],['UNDER',''],['WANT',''],['WAS',''],['WELL',''],['WENT',''],['WHAT',''],['WHITE','⚪'],['WHO',''],['WILL',''],['WITH',''],['YES','']];
+const CVC=[['CAT','🐱'],['DOG','🐶'],['SUN','☀️'],['HAT','🎩'],['BUS','🚌'],['PIG','🐷'],['BED','🛏️'],['CUP','🥤'],['MAP','🗺️'],['HEN','🐔'],['FOX','🦊'],['BUG','🐛']];
+let deck=[],last='';function nextWord(){if(Math.random()<.2){const w=CVC[Math.floor(Math.random()*CVC.length)];if(w[0]!=last){last=w[0];return[w,0]}}if(!deck.length){deck=SIGHT.slice();for(let i=deck.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[deck[i],deck[j]]=[deck[j],deck[i]]}if(deck[deck.length-1][0]==last)deck.unshift(deck.pop())}const w=deck.pop();last=w[0];return[w,1]}
 const CC=['#ff2e9a','#ffe600','#00c2b8','#ff8a00','#7b2ff7','#33d17a'];
 let name='',word='',emoji='',idx=0,cars=[],fly=[],conf=[],state='setup',celebT=0,spawnT=0,wi=0,msg='',msg2='',t=0,sinceNeed=0;
 const sq=[...Array(14)].map(()=>({x:Math.random(),y:Math.random()*.06+.22*0,k:Math.floor(Math.random()*3),c:CC[Math.floor(Math.random()*6)],r:Math.random()*6}));
@@ -72,7 +74,7 @@ for(const k of cars)k.x+=k.sp*k.d;cars=cars.filter(k=>k.x>-100*S&&k.x<W+100*S);[
 for(const f of fly){f.p+=.04;const e=1-Math.pow(1-Math.min(1,f.p),3);T(f.ch,f.x+(f.tx-f.x)*e,f.y+(f.ty-f.y)*e-Math.sin(e*Math.PI)*80*S,50*S,f.col)}fly=fly.filter(f=>f.p<1);
 if(state=='celeb'){celebT++;x.save();x.translate(W/2,H*.38);x.rotate(Math.sin(t*.1)*.06);x.fillStyle='#ff2e9a';x.strokeStyle='#ffe600';x.lineWidth=6*S;rr(-W*.45,-55*S,W*.9,110*S,30*S);x.fill();x.stroke();
 T(msg,0,-16*S,Math.min(30*S,W*.065),'#fff');T(msg2,0,26*S,Math.min(18*S,W*.042),'#ffe600');x.restore();
-if(celebT>200){const w=WORDS[wi%WORDS.length];wi++;msg='Spell the word!';setWord(w[0],w[1]);state='play'}}
+if(celebT>200){const [w,sight]=nextWord();wi++;msg=sight?'Sight Word!':'Spell the word!';setWord(w[0],w[1]);state='play'}}
 for(const p of conf){p.x+=p.vx;p.y+=p.vy;p.r+=.1;x.save();x.translate(p.x,p.y);x.rotate(p.r);x.fillStyle=p.c;x.fillRect(-p.s/2,-p.s/4,p.s,p.s/2);x.restore()}conf=conf.filter(p=>p.y<H)}
 requestAnimationFrame(step)}step();
 </script></body></html>
