@@ -1,25 +1,36 @@
 <!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Letter Traffic – Dr. Kelly's Class</title><style>
+<link rel="manifest" href="manifest.json"><meta name="theme-color" content="#7b2ff7"><link rel="apple-touch-icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><title>Letter Traffic – Dr. Kelly's Class</title><style>
 html,body{margin:0;height:100%;overflow:hidden;touch-action:none;font-family:"Arial Rounded MT Bold","Trebuchet MS",Verdana,sans-serif;background:#1ad1c4}
 canvas{display:block;width:100vw;height:100vh}
-#setup{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;background:repeating-linear-gradient(45deg,#7b2ff7 0 30px,#8f45ff 30px 60px)}
-#setup h1{margin:0;font-size:46px;color:#ffe600;text-shadow:4px 4px 0 #ff2e9a,8px 8px 0 #00c2b8;text-align:center;line-height:1.05;transform:rotate(-4deg)}
+.scr{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;gap:16px;padding:24px 12px 40px;box-sizing:border-box;overflow-y:auto;background:repeating-linear-gradient(45deg,#7b2ff7 0 30px,#8f45ff 30px 60px)}
+#home h1{margin:0;font-size:46px;color:#ffe600;text-shadow:4px 4px 0 #ff2e9a,8px 8px 0 #00c2b8;text-align:center;line-height:1.05;transform:rotate(-4deg)}
 #ban{background:#ff2e9a;color:#fff;font-size:26px;font-weight:bold;padding:8px 24px;border:5px solid #ffe600;border-radius:16px;transform:rotate(3deg);box-shadow:5px 5px 0 #00c2b8}
-#setup p{color:#fff;font-size:20px;margin:0;font-weight:bold}
+.scr p{color:#fff;font-size:20px;margin:0;font-weight:bold}
 #nm{font-size:36px;font-weight:bold;font-family:inherit;width:78vw;max-width:420px;padding:14px;border:6px solid #ff2e9a;border-radius:22px;text-align:center;text-transform:uppercase;background:#fff8c0;color:#5a00b0;box-sizing:border-box}
 #go{font-family:inherit;font-size:34px;font-weight:bold;padding:16px 56px;border:6px solid #fff;border-radius:40px;background:#ff8a00;color:#fff;box-shadow:6px 6px 0 #00c2b8}
 #gear{position:fixed;right:10px;bottom:10px;font-size:26px;width:50px;height:50px;border-radius:50%;border:4px solid #fff;background:#7b2ff7;color:#fff;display:none}
+#teacher{display:none;background:#00a89f}
+.pill{font-family:inherit;font-size:24px;font-weight:bold;padding:12px 30px;border:5px solid #fff;border-radius:40px;background:#ff8a00;color:#fff;box-shadow:5px 5px 0 #ff2e9a}.small{font-size:18px;padding:8px 18px}
+#kids{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;max-width:640px}
+.kb{font-family:inherit;min-width:140px;padding:14px 16px;border:5px solid #fff;border-radius:24px;color:#fff;font-size:30px;font-weight:bold;box-shadow:5px 5px 0 #2a0050;text-shadow:2px 2px 0 #2a0050}.kb small{display:block;font-size:16px;margin-top:4px}
+#inst{display:none;background:#33d17a}#ioshint{display:none;color:#fff;background:#2a0050;padding:10px 16px;border-radius:14px;font-size:16px;text-align:center}
+#teacher h2{color:#ffe600;font-size:34px;margin:0;text-shadow:3px 3px 0 #ff2e9a}.row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+#newk,.ren{font-family:inherit;font-size:24px;font-weight:bold;padding:10px;border:4px solid #ff2e9a;border-radius:16px;text-transform:uppercase;width:200px;background:#fff8c0;color:#5a00b0}
+details{background:#fff8c0;border:4px solid #7b2ff7;border-radius:18px;padding:10px 14px;width:min(92vw,560px);box-sizing:border-box;color:#2a0050;font-size:18px}
+summary{font-size:24px;font-weight:bold;cursor:pointer}details label{display:block;margin:8px 0}details textarea{width:100%;font-size:18px;font-family:inherit;text-transform:uppercase;box-sizing:border-box}
+details select{font-size:18px;padding:4px}.chips span{display:inline-block;background:#33d17a;color:#fff;border-radius:10px;padding:2px 8px;margin:2px;font-size:14px}.chips span.w{background:#ff8a00}
+.del{background:#ff2e9a!important}
 </style></head><body>
 <canvas id="c"></canvas>
-<div id="setup"><div id="ban">⭐ Dr. Kelly's Class ⭐</div><h1>LETTER<br>TRAFFIC!</h1><p>Teacher: type the child's name</p><input id="nm" maxlength="12" autocomplete="off" placeholder="NAME"><button id="go">START ▶</button></div>
-<button id="gear" title="Change name">⚙</button>
+<div id="home" class="scr"><div id="ban">⭐ Dr. Kelly's Class ⭐</div><h1>LETTER<br>TRAFFIC!</h1><p>Who's playing? Tap your name!</p><div id="kids"></div><p id="empty">Teacher: tap ⚙ Teacher to add your class!</p><button id="inst" class="pill">📲 Install app</button><div id="ioshint">On iPhone/iPad: tap Share ⬆ then “Add to Home Screen”</div><button id="tbtn" class="pill small">⚙ Teacher</button></div>
+<div id="teacher" class="scr"><h2>Teacher Settings</h2><div class="row"><input id="newk" placeholder="NEW NAME" maxlength="12" autocomplete="off"><button id="addk" class="pill">+ Add</button></div><div id="tlist"></div><div class="row"><button id="exp" class="pill small">💾 Export class</button><button id="imp" class="pill small">📂 Import class</button><input type="file" id="impf" accept=".json,application/json" hidden></div><button id="tback" class="pill">✔ Done</button></div>
+<button id="gear" title="Back to names">⚙</button>
 <script>
 const c=document.getElementById('c'),x=c.getContext('2d');let W,H,S,DPR;
 function rs(){DPR=devicePixelRatio||1;W=c.width=innerWidth*DPR;H=c.height=innerHeight*DPR;S=Math.min(W/400,H/800)}addEventListener('resize',rs);rs();
 const F='"Arial Rounded MT Bold",Verdana,sans-serif';
 const SIGHT=[['A',''],['AND',''],['AWAY',''],['BIG',''],['BLUE','🔵'],['CAN',''],['COME',''],['DOWN',''],['FIND',''],['FOR',''],['FUNNY',''],['GO',''],['HELP',''],['HERE',''],['I',''],['IN',''],['IS',''],['IT',''],['JUMP',''],['LITTLE',''],['LOOK',''],['MAKE',''],['ME',''],['MY',''],['NOT',''],['ONE','1️⃣'],['PLAY',''],['RED','🔴'],['RUN',''],['SAID',''],['SEE',''],['THE',''],['THREE','3️⃣'],['TO',''],['TWO','2️⃣'],['UP',''],['WE',''],['WHERE',''],['YELLOW','🟡'],['YOU',''],['ALL',''],['AM',''],['ARE',''],['AT',''],['ATE',''],['BE',''],['BLACK','⚫'],['BROWN','🟤'],['BUT',''],['CAME',''],['DID',''],['DO',''],['EAT',''],['FOUR','4️⃣'],['GET',''],['GOOD',''],['HAVE',''],['HE',''],['INTO',''],['LIKE',''],['MUST',''],['NEW',''],['NO',''],['NOW',''],['ON',''],['OUR',''],['OUT',''],['PLEASE',''],['PRETTY',''],['RAN',''],['RIDE',''],['SAW',''],['SAY',''],['SHE',''],['SO',''],['SOON',''],['THAT',''],['THERE',''],['THEY',''],['THIS',''],['TOO',''],['UNDER',''],['WANT',''],['WAS',''],['WELL',''],['WENT',''],['WHAT',''],['WHITE','⚪'],['WHO',''],['WILL',''],['WITH',''],['YES','']];
 const CVC=[['CAT','🐱'],['DOG','🐶'],['SUN','☀️'],['HAT','🎩'],['BUS','🚌'],['PIG','🐷'],['BED','🛏️'],['CUP','🥤'],['MAP','🗺️'],['HEN','🐔'],['FOX','🦊'],['BUG','🐛']];
-let deck=[],last='';function nextWord(){if(Math.random()<.2){const w=CVC[Math.floor(Math.random()*CVC.length)];if(w[0]!=last){last=w[0];return[w,0]}}if(!deck.length){deck=SIGHT.slice();for(let i=deck.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[deck[i],deck[j]]=[deck[j],deck[i]]}if(deck[deck.length-1][0]==last)deck.unshift(deck.pop())}const w=deck.pop();last=w[0];return[w,1]}
 const CC=['#ff2e9a','#ffe600','#00c2b8','#ff8a00','#7b2ff7','#33d17a'];
 let name='',word='',emoji='',idx=0,cars=[],fly=[],conf=[],state='setup',celebT=0,spawnT=0,wi=0,msg='',msg2='',t=0,sinceNeed=0;
 const sq=[...Array(14)].map(()=>({x:Math.random(),y:Math.random()*.06+.22*0,k:Math.floor(Math.random()*3),c:CC[Math.floor(Math.random()*6)],r:Math.random()*6}));
@@ -30,20 +41,48 @@ function ding(){try{[523,659,784].forEach((f,i)=>tone(f,i*.07,.25,'square',.08))
 function fanfare(){try{[523,659,784,1047,784,1047].forEach((f,i)=>tone(f,i*.12,.3,'square',.08))}catch(e){}}
 function say(s,raw){try{const u=new SpeechSynthesisUtterance(raw?s:s.toLowerCase());u.rate=.8;speechSynthesis.cancel();speechSynthesis.speak(u)}catch(e){}}
 function setWord(w,e){word=w;emoji=e||'';idx=0;cars=[];sinceNeed=0;say(w)}
-function start(){name=(document.getElementById('nm').value||'').toUpperCase().replace(/[^A-Z]/g,'');if(!name)return;localStorage.setItem('ltName',name);A();
-document.getElementById('setup').style.display='none';document.getElementById('gear').style.display='block';state='play';wi=0;msg='Spell your name!';setWord(name,'⭐')}
-document.getElementById('go').onclick=start;document.getElementById('nm').onkeydown=e=>{if(e.key=='Enter')start()};
-document.getElementById('nm').value=localStorage.getItem('ltName')||'';
-document.getElementById('gear').onclick=e=>{e.stopPropagation();state='setup';document.getElementById('setup').style.display='flex';document.getElementById('gear').style.display='none'};
+const $=id=>document.getElementById(id);
+function clean(n){return(n||'').toUpperCase().replace(/[^A-Z]/g,'').slice(0,12)}
+function newKid(n){return{id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),name:clean(n),sight:true,pic:true,custom:[],speed:'med',prog:{},stars:0}}
+let DB;try{DB=JSON.parse(localStorage.getItem('ltClass'))}catch(e){}
+if(!DB||!Array.isArray(DB.kids)){DB={kids:[]};const o=clean(localStorage.getItem('ltName'));if(o)DB.kids.push(newKid(o))}
+function saveDB(){localStorage.setItem('ltClass',JSON.stringify(DB))}saveDB();
+let kid=null,last='';const SPD={slow:.6,med:1,fast:1.4};
+function mastered(k){return Object.keys(k.prog).filter(w=>k.prog[w]>=2)}
+function nextWord(){let pool=[];if(kid.sight)SIGHT.forEach(w=>pool.push([w,1]));if(kid.pic)CVC.forEach(w=>pool.push([w,0]));kid.custom.forEach(c=>{for(let i=0;i<3;i++)pool.push([[c,''],2])});if(!pool.length)SIGHT.forEach(w=>pool.push([w,1]));
+let cand=pool.filter(p=>p[0][0]!=last);if(!cand.length)cand=pool;const un=cand.filter(p=>(kid.prog[p[0][0]]||0)<2);if(un.length&&Math.random()<.85)cand=un;const r=cand[Math.floor(Math.random()*cand.length)];last=r[0][0];return r}
+function show(id){['home','teacher'].forEach(k=>$(k).style.display=k==id?'flex':'none');$('gear').style.display=id?'none':'block'}
+function renderHome(){const box=$('kids');box.innerHTML='';DB.kids.forEach((k,i)=>{const b=document.createElement('button');b.className='kb';b.style.background=CC[[0,4,3,2,5][i%5]];b.textContent=k.name;const sm=document.createElement('small');sm.textContent='⭐ '+k.stars+' · '+mastered(k).length+' words';b.appendChild(sm);b.onclick=()=>start(k);box.appendChild(b)});$('empty').style.display=DB.kids.length?'none':'block'}
+function goHome(){state='setup';cars=[];conf=[];renderHome();show('home')}
+function start(k){kid=k;name=k.name;last='';A();show(null);state='play';wi=0;msg='Spell your name!';setWord(name,'⭐')}
+function renderTeacher(){const box=$('tlist');box.innerHTML='';DB.kids.forEach(k=>{const d=document.createElement('details');const m=mastered(k);
+d.innerHTML=`<summary></summary><label>Name: <input class="ren" maxlength="12"></label><label><input type="checkbox" class="cs"> Sight Words (Dolch)</label><label><input type="checkbox" class="cp"> Picture Words (CAT, DOG…)</label><label>Custom words (separate with spaces or commas):<textarea class="cw" rows="2"></textarea></label><label>Speed: <select class="sp"><option value="slow">Slow</option><option value="med">Medium</option><option value="fast">Fast</option></select></label><div><b>Progress:</b> ⭐ <span class="st"></span> stars · <span class="mc"></span> words mastered (spelled 2×)</div><div class="chips"></div><div class="row" style="margin-top:8px"><button class="pill small rp">↺ Reset progress</button><button class="pill small del">🗑 Remove</button></div>`;
+const q=c=>d.querySelector(c);q('summary').textContent=k.name+'  ⭐'+k.stars;q('.ren').value=k.name;q('.cs').checked=k.sight;q('.cp').checked=k.pic;q('.cw').value=k.custom.join(' ');q('.sp').value=k.speed;q('.st').textContent=k.stars;q('.mc').textContent=m.length;
+Object.keys(k.prog).sort().forEach(w=>{const s=document.createElement('span');s.textContent=w+(k.prog[w]>=2?' ✓':' ·'+k.prog[w]);if(k.prog[w]<2)s.className='w';q('.chips').appendChild(s)});
+q('.ren').onchange=e=>{const n=clean(e.target.value);if(n){k.name=n;saveDB();renderTeacher()}else e.target.value=k.name};
+q('.cs').onchange=e=>{k.sight=e.target.checked;saveDB()};q('.cp').onchange=e=>{k.pic=e.target.checked;saveDB()};
+q('.cw').onchange=e=>{k.custom=[...new Set(e.target.value.split(/[\s,;]+/).map(clean).filter(Boolean))];e.target.value=k.custom.join(' ');saveDB()};
+q('.sp').onchange=e=>{k.speed=e.target.value;saveDB()};
+q('.rp').onclick=()=>{if(confirm('Reset progress for '+k.name+'?')){k.prog={};k.stars=0;saveDB();renderTeacher()}};
+q('.del').onclick=()=>{if(confirm('Remove '+k.name+' from the class?')){DB.kids=DB.kids.filter(z=>z!=k);saveDB();renderTeacher()}};box.appendChild(d)})}
+$('tbtn').onclick=()=>{renderTeacher();show('teacher')};$('tback').onclick=goHome;
+const addKid=()=>{const n=clean($('newk').value);if(!n)return;DB.kids.push(newKid(n));saveDB();$('newk').value='';renderTeacher()};$('addk').onclick=addKid;$('newk').onkeydown=e=>{if(e.key=='Enter')addKid()};
+$('exp').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(DB,null,1)],{type:'application/json'}));a.download='letter-traffic-class.json';document.body.appendChild(a);a.click();a.remove()};
+$('imp').onclick=()=>$('impf').click();$('impf').onchange=e=>{const f=e.target.files[0];if(!f)return;f.text().then(t=>{try{const d=JSON.parse(t);if(!Array.isArray(d.kids))throw 0;
+d.kids=d.kids.filter(k=>k&&clean(k.name)).map(k=>Object.assign(newKid(k.name),k,{name:clean(k.name)}));if(confirm('Replace this class with '+d.kids.length+' kids from the file?')){DB=d;saveDB();renderTeacher()}}catch(er){alert('That file is not a Letter Traffic class backup.')}});e.target.value=''};
+$('gear').onclick=e=>{e.stopPropagation();goHome()};
+let dp;addEventListener('beforeinstallprompt',e=>{e.preventDefault();dp=e;$('inst').style.display='block'});$('inst').onclick=()=>{if(dp){dp.prompt();dp=null;$('inst').style.display='none'}};
+if(/iphone|ipad|ipod/i.test(navigator.userAgent)&&!navigator.standalone)$('ioshint').style.display='block';
+if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js');
 function lanes(){const top=H*.5,bot=H*.95,h=(bot-top)/4;return[0,1,2,3].map(i=>top+h*(i+.75))}
 function spawn(){const L=lanes(),li=Math.floor(Math.random()*4);const d=li%2?1:-1,sx=d<0?W+70*S:-70*S;if(cars.some(k=>k.l==li&&Math.abs(k.x-sx)<170*S))return;
 const need=word[idx];let ch;if(sinceNeed>=1||Math.random()<.5){ch=need;sinceNeed=0}else{ch=String.fromCharCode(65+Math.floor(Math.random()*26));if(ch==need)sinceNeed=0;else sinceNeed++}
-cars.push({x:sx,d,l:li,y:L[li],ch,col:CC[Math.floor(Math.random()*6)],bus:Math.random()<.35,sp:(1.6+Math.random()*.6)*S,wob:Math.random()*6})}
+cars.push({x:sx,d,l:li,y:L[li],ch,col:CC[Math.floor(Math.random()*6)],bus:Math.random()<.35,sp:(1.6+Math.random()*.6)*S*SPD[kid.speed||'med'],wob:Math.random()*6})}
 c.addEventListener('pointerdown',e=>{e.preventDefault();if(state!='play')return;A();const px=e.clientX*DPR,py=e.clientY*DPR;
 let hit=null,bd=1e9;for(const k of cars){const d=Math.hypot(k.x-px,k.y-40*S-py);if(d<95*S&&d<bd){bd=d;hit=k}}if(!hit)return;
 say(hit.ch,1);if(hit.ch==word[idx]){ding();const sl=slotPos(idx);fly.push({ch:hit.ch,x:hit.x,y:hit.y-60*S,tx:sl.x,ty:sl.y,p:0,col:hit.col,i:idx});cars=cars.filter(k=>k!=hit);idx++;
 if(idx>=word.length){state='celeb';celebT=0;fanfare();for(let i=0;i<150;i++)conf.push({x:Math.random()*W,y:-Math.random()*H*.5,vx:(Math.random()-.5)*3*S,vy:(2+Math.random()*3)*S,c:CC[i%6],r:Math.random()*6,s:(6+Math.random()*8)*S});
-msg=word==name&&wi==0?'You spelled your name!':'You spelled '+word+'!';msg2="Way to go, Dr. Kelly's Class!";setTimeout(()=>say(word==name&&wi==0?'You spelled your name, '+name:'You spelled '+word),600)}}else{boing();hit.shake=20}},{passive:false});
+msg=word==name&&wi==0?'You spelled your name!':'You spelled '+word+'!';msg2="Way to go, Dr. Kelly's Class!";kid.stars++;if(!(word==name&&wi==0))kid.prog[word]=(kid.prog[word]||0)+1;saveDB();setTimeout(()=>say(word==name&&wi==0?'You spelled your name, '+name:'You spelled '+word),600)}}else{boing();hit.shake=20}},{passive:false});
 function slotPos(i){const n=word.length,sw=Math.min(70*S,W*.9/n);return{x:W/2-sw*n/2+sw*(i+.5),y:H*.13,w:sw}}
 function rr(X,Y,w,h,r){x.beginPath();x.roundRect(X,Y,w,h,r)}
 function T(s,X,Y,sz,col){x.font=`900 ${sz}px ${F}`;x.textAlign='center';x.textBaseline='middle';x.fillStyle=col;x.fillText(s,X,Y,W*.94)}
@@ -74,7 +113,7 @@ for(const k of cars)k.x+=k.sp*k.d;cars=cars.filter(k=>k.x>-100*S&&k.x<W+100*S);[
 for(const f of fly){f.p+=.04;const e=1-Math.pow(1-Math.min(1,f.p),3);T(f.ch,f.x+(f.tx-f.x)*e,f.y+(f.ty-f.y)*e-Math.sin(e*Math.PI)*80*S,50*S,f.col)}fly=fly.filter(f=>f.p<1);
 if(state=='celeb'){celebT++;x.save();x.translate(W/2,H*.38);x.rotate(Math.sin(t*.1)*.06);x.fillStyle='#ff2e9a';x.strokeStyle='#ffe600';x.lineWidth=6*S;rr(-W*.45,-55*S,W*.9,110*S,30*S);x.fill();x.stroke();
 T(msg,0,-16*S,Math.min(30*S,W*.065),'#fff');T(msg2,0,26*S,Math.min(18*S,W*.042),'#ffe600');x.restore();
-if(celebT>200){const [w,sight]=nextWord();wi++;msg=sight?'Sight Word!':'Spell the word!';setWord(w[0],w[1]);state='play'}}
+if(celebT>200){const [w,sight]=nextWord();wi++;msg=sight==1?'Sight Word!':sight==2?'Special Word!':'Spell the word!';setWord(w[0],w[1]);state='play'}}
 for(const p of conf){p.x+=p.vx;p.y+=p.vy;p.r+=.1;x.save();x.translate(p.x,p.y);x.rotate(p.r);x.fillStyle=p.c;x.fillRect(-p.s/2,-p.s/4,p.s,p.s/2);x.restore()}conf=conf.filter(p=>p.y<H)}
-requestAnimationFrame(step)}step();
+requestAnimationFrame(step)}renderHome();step();
 </script></body></html>
