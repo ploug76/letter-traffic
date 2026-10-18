@@ -23,12 +23,13 @@ details select{font-size:18px;padding:4px}.chips span{display:inline-block;backg
 #pin{display:none;background:#2a0050}#pin h2{color:#ffe600;font-size:28px;margin:10px 0 0;text-align:center}#pdots{font-size:48px;color:#fff;letter-spacing:12px}
 #pad{display:grid;grid-template-columns:repeat(3,86px);gap:14px}#pad button{font-family:inherit;font-size:38px;font-weight:bold;height:86px;border-radius:50%;border:5px solid #fff;color:#fff;box-shadow:4px 4px 0 #ff2e9a}
 #rep{position:fixed;left:8px;top:4px;width:58px;height:58px;border-radius:50%;border:5px solid #fff;background:#ffe600;font-size:30px;box-shadow:4px 4px 0 #ff2e9a;display:none;padding:0;z-index:5}#rep:active{transform:scale(.92)}
+#pz,#mu{position:fixed;top:calc(20vh + 8px);width:52px;height:52px;border-radius:50%;border:4px solid #fff;background:#7b2ff7;color:#fff;font-size:24px;display:none;padding:0;z-index:5;box-shadow:3px 3px 0 #ff2e9a}#pz{right:8px}#mu{right:70px}#pz:active,#mu:active{transform:scale(.92)}
 </style></head><body>
 <canvas id="c"></canvas>
 <div id="home" class="scr"><div id="ban">⭐ Dr. Kelly's Class ⭐</div><h1>LETTER<br>TRAFFIC!</h1><p>Who's playing? Tap your name!</p><div id="kids"></div><p id="empty">Teacher: tap ⚙ Teacher to add your class!</p><button id="inst" class="pill">📲 Install app</button><div id="ioshint">On iPhone/iPad: tap Share ⬆ then “Add to Home Screen”</div><button id="tbtn" class="pill small">⚙ Teacher</button></div>
 <div id="teacher" class="scr"><h2>Teacher Settings</h2><div class="row"><input id="newk" placeholder="NEW NAME" maxlength="12" autocomplete="off"><button id="addk" class="pill">+ Add</button></div><div id="tlist"></div><div class="row"><button id="chpin" class="pill small">🔒 Change PIN</button><button id="exp" class="pill small">💾 Export class</button><button id="imp" class="pill small">📂 Import class</button><input type="file" id="impf" accept=".json,application/json" hidden></div><button id="tback" class="pill">✔ Done</button></div>
 <div id="pin" class="scr"><h2 id="ptitle"></h2><div id="pdots"></div><div id="pad"></div><div class="row"><button id="pforgot" class="pill small">Forgot PIN?</button><button id="pcancel" class="pill small del">✖ Cancel</button></div></div>
-<button id="rep" title="Hear the word" aria-label="Hear the word">🔊</button><button id="gear" title="Back to names">⚙</button>
+<button id="rep" title="Hear the word" aria-label="Hear the word">🔊</button><button id="gear" title="Back to names">⚙</button><button id="pz" aria-label="Pause">⏸</button><button id="mu" aria-label="Sound">🔊</button>
 <script>
 const c=document.getElementById('c'),x=c.getContext('2d');let W,H,S,DPR;
 function rs(){DPR=devicePixelRatio||1;W=c.width=innerWidth*DPR;H=c.height=innerHeight*DPR;S=Math.min(W/400,H/800)}addEventListener('resize',rs);rs();
@@ -38,12 +39,13 @@ const CVC=[['CAT','🐱'],['DOG','🐶'],['SUN','☀️'],['HAT','🎩'],['BUS',
 const CC=['#ff2e9a','#ffe600','#00c2b8','#ff8a00','#7b2ff7','#33d17a'];
 let drawn=[],name='',word='',emoji='',idx=0,cars=[],fly=[],conf=[],state='setup',celebT=0,spawnT=0,wi=0,msg='',msg2='',t=0,sinceNeed=0;
 const sq=[...Array(14)].map(()=>({x:Math.random(),y:Math.random()*.06+.22*0,k:Math.floor(Math.random()*3),c:CC[Math.floor(Math.random()*6)],r:Math.random()*6}));
+let paused=false,muted=localStorage.getItem('ltMute')=='1';
 let ac;function A(){ac=ac||new(window.AudioContext||webkitAudioContext)();if(ac.state=='suspended')ac.resume();return ac}
-function tone(f,t0,d,type,g,f2){const a=A(),o=a.createOscillator(),v=a.createGain(),n=a.currentTime+t0;o.type=type;o.frequency.setValueAtTime(f,n);if(f2)o.frequency.exponentialRampToValueAtTime(f2,n+d);v.gain.setValueAtTime(g,n);v.gain.exponentialRampToValueAtTime(.001,n+d);o.connect(v);v.connect(a.destination);o.start(n);o.stop(n+d)}
+function tone(f,t0,d,type,g,f2){if(muted)return;const a=A(),o=a.createOscillator(),v=a.createGain(),n=a.currentTime+t0;o.type=type;o.frequency.setValueAtTime(f,n);if(f2)o.frequency.exponentialRampToValueAtTime(f2,n+d);v.gain.setValueAtTime(g,n);v.gain.exponentialRampToValueAtTime(.001,n+d);o.connect(v);v.connect(a.destination);o.start(n);o.stop(n+d)}
 function boing(){try{tone(300,0,.4,'sine',.3,90);tone(500,.05,.25,'triangle',.1,200)}catch(e){}}
 function ding(){try{[523,659,784].forEach((f,i)=>tone(f,i*.07,.25,'square',.08))}catch(e){}}
 function fanfare(){try{[523,659,784,1047,784,1047].forEach((f,i)=>tone(f,i*.12,.3,'square',.08))}catch(e){}}
-let sayTok=0;function say(s,raw){const my=++sayTok,txt=raw?s:s.toLowerCase();try{speechSynthesis.cancel()}catch(e){}setTimeout(()=>{if(my!=sayTok)return;try{const u=new SpeechSynthesisUtterance(txt);u.lang='en-US';u.rate=.85;speechSynthesis.speak(u)}catch(e){}},40)}
+let sayTok=0;function say(s,raw){if(muted)return;const my=++sayTok,txt=raw?s:s.toLowerCase();try{speechSynthesis.cancel()}catch(e){}setTimeout(()=>{if(my!=sayTok)return;try{const u=new SpeechSynthesisUtterance(txt);u.lang='en-US';u.rate=.85;speechSynthesis.speak(u)}catch(e){}},40)}
 function letterSay(ch){const l=ch.toLowerCase();return l=='a'?'a.':l}
 function setWord(w,e){word=w==name?w:w=='I'?'I':w.toLowerCase();emoji=e||'';idx=0;cars=[];sinceNeed=0;say(w)}
 const $=id=>document.getElementById(id);
@@ -56,7 +58,7 @@ let kid=null,last='';const SPD={slow:.6,med:1,fast:1.4};
 function mastered(k){return Object.keys(k.prog).filter(w=>k.prog[w]>=2)}
 function nextWord(){let pool=[];SIGHT.forEach(w=>{if(kid.fry[w[2]])pool.push([w,1])});if(kid.pic)CVC.forEach(w=>pool.push([w,0]));kid.custom.forEach(c=>{for(let i=0;i<3;i++)pool.push([[c,''],2])});if(!pool.length)SIGHT.slice(0,25).forEach(w=>pool.push([w,1]));
 let cand=pool.filter(p=>p[0][0]!=last);if(!cand.length)cand=pool;const un=cand.filter(p=>(kid.prog[p[0][0]]||0)<2);if(un.length&&Math.random()<.85)cand=un;const r=cand[Math.floor(Math.random()*cand.length)];last=r[0][0];return r}
-function show(id){['home','teacher','pin'].forEach(k=>$(k).style.display=k==id?'flex':'none');$('gear').style.display=$('rep').style.display=id?'none':'block'}
+function show(id){['home','teacher','pin'].forEach(k=>$(k).style.display=k==id?'flex':'none');$('gear').style.display=$('rep').style.display=$('pz').style.display=$('mu').style.display=id?'none':'block';if(id&&paused)togglePause()}
 function renderHome(){const box=$('kids');box.innerHTML='';DB.kids.forEach((k,i)=>{const b=document.createElement('button');b.className='kb';b.style.background=CC[[0,4,3,2,5][i%5]];b.textContent=cap(k.name);const sm=document.createElement('small');sm.textContent='⭐ '+k.stars+' · '+mastered(k).length+' words';b.appendChild(sm);b.onclick=()=>start(k);box.appendChild(b)});$('empty').style.display=DB.kids.length?'none':'block'}
 function goHome(){state='setup';cars=[];conf=[];renderHome();show('home')}
 function start(k){kid=k;name=cap(k.name);last='';A();show(null);state='play';wi=0;msg='Spell your name!';setWord(name,'⭐')}
@@ -95,7 +97,7 @@ cars.push({x:sx,d,l:li,y:L[li],ch,col:CC[Math.floor(Math.random()*6)],bus:Math.r
 function hitAt(px,py){for(const P of[0,12*S])for(let i=drawn.length-1;i>=0;i--){const k=drawn[i],g=k.g;if(!g||!cars.includes(k))continue;
 if(Math.hypot(px-g.x,py-g.ly)<=26*S+P||(Math.abs(px-g.x)<=g.w/2+P&&py>=g.y-g.h*1.3-P&&py<=g.y+P))return k}
 let best=null,bd=48*S;for(const k of drawn){if(!k.g||!cars.includes(k))continue;const d=Math.hypot(px-k.g.x,py-k.g.ly);if(d<bd){bd=d;best=k}}return best}
-c.addEventListener('pointerdown',e=>{e.preventDefault();if(state!='play')return;A();const R=c.getBoundingClientRect(),px=(e.clientX-R.left)*W/R.width,py=(e.clientY-R.top)*H/R.height;
+c.addEventListener('pointerdown',e=>{e.preventDefault();if(paused){togglePause();return}if(state!='play')return;A();const R=c.getBoundingClientRect(),px=(e.clientX-R.left)*W/R.width,py=(e.clientY-R.top)*H/R.height;
 if(py<H*.2){if(word)say(word);return}const hit=hitAt(px,py);if(!hit)return;
 say(letterSay(hit.ch),1);if(hit.ch==word[idx]){ding();const sl=slotPos(idx);fly.push({ch:hit.ch,x:hit.x,y:hit.y-60*S,tx:sl.x,ty:sl.y,p:0,col:hit.col,i:idx});cars=cars.filter(k=>k!=hit);idx++;
 if(idx>=word.length){state='celeb';celebT=0;fanfare();for(let i=0;i<150;i++)conf.push({x:Math.random()*W,y:-Math.random()*H*.5,vx:(Math.random()-.5)*3*S,vy:(2+Math.random()*3)*S,c:CC[i%6],r:Math.random()*6,s:(6+Math.random()*8)*S});
@@ -132,5 +134,14 @@ if(state=='celeb'){celebT++;x.save();x.translate(W/2,H*.38);x.rotate(Math.sin(t*
 T(msg,0,-16*S,Math.min(30*S,W*.065),'#fff');T(msg2,0,26*S,Math.min(18*S,W*.042),'#ffe600');x.restore();
 if(celebT>200){const [w,sight]=nextWord();wi++;msg=sight==1?'Sight Word!':sight==2?'Special Word!':'Spell the word!';setWord(w[0],w[1]);state='play'}}
 for(const p of conf){p.x+=p.vx;p.y+=p.vy;p.r+=.1;x.save();x.translate(p.x,p.y);x.rotate(p.r);x.fillStyle=p.c;x.fillRect(-p.s/2,-p.s/4,p.s,p.s/2);x.restore()}conf=conf.filter(p=>p.y<H)}
-requestAnimationFrame(step)}renderHome();step();
+}
+function pauseOverlay(){x.fillStyle='rgba(20,0,50,.55)';x.fillRect(0,0,W,H);T('Paused',W/2,H*.42,44*S,'#ffe600');T('Tap to keep going',W/2,H*.5,22*S,'#fff')}
+function togglePause(){paused=!paused;$('pz').textContent=paused?'▶':'⏸';if(paused){try{speechSynthesis.cancel()}catch(e){}pauseOverlay()}}
+function setMute(m){muted=m;localStorage.setItem('ltMute',m?'1':'0');$('mu').textContent=m?'🔇':'🔊';if(m)try{speechSynthesis.cancel()}catch(e){}}
+['pointerdown','touchstart'].forEach(ev=>['pz','mu'].forEach(k=>$(k).addEventListener(ev,e=>e.stopPropagation())));
+$('pz').onclick=e=>{e.stopPropagation();if(state=='play'||state=='celeb'||paused)togglePause()};$('mu').onclick=e=>{e.stopPropagation();setMute(!muted)};setMute(muted);
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&!paused&&(state=='play'||state=='celeb'))togglePause()});
+// fixed 60 Hz game speed (same speed on 60/90/120 Hz screens)
+let lastF=performance.now(),accF=0;function drive(now){requestAnimationFrame(drive);accF+=Math.min(100,now-lastF);lastF=now;if(paused){accF=0;return}let n=0;while(accF>=15.2&&n<4){step();accF-=1000/60;n++}if(accF<-8)accF=-8}
+renderHome();step();requestAnimationFrame(drive);
 </script></body></html>
