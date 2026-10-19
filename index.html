@@ -24,12 +24,13 @@ details select{font-size:18px;padding:4px}.chips span{display:inline-block;backg
 #pad{display:grid;grid-template-columns:repeat(3,86px);gap:14px}#pad button{font-family:inherit;font-size:38px;font-weight:bold;height:86px;border-radius:50%;border:5px solid #fff;color:#fff;box-shadow:4px 4px 0 #ff2e9a}
 #rep{position:fixed;left:8px;top:4px;width:58px;height:58px;border-radius:50%;border:5px solid #fff;background:#ffe600;font-size:30px;box-shadow:4px 4px 0 #ff2e9a;display:none;padding:0;z-index:5}#rep:active{transform:scale(.92)}
 #pz,#mu{position:fixed;top:calc(20vh + 8px);width:52px;height:52px;border-radius:50%;border:4px solid #fff;background:#7b2ff7;color:#fff;font-size:24px;display:none;padding:0;z-index:5;box-shadow:3px 3px 0 #ff2e9a}#pz{right:8px}#mu{right:70px}#pz:active,#mu:active{transform:scale(.92)}
+#mu{position:fixed}#mu.off::after{content:'';position:absolute;left:18%;right:18%;top:50%;height:3px;background:#e33;border-radius:2px;transform:rotate(-45deg);box-shadow:0 0 0 1px #fff}
 </style></head><body>
 <canvas id="c"></canvas>
 <div id="home" class="scr"><div id="ban">⭐ Dr. Kelly's Class ⭐</div><h1>LETTER<br>TRAFFIC!</h1><p>Who's playing? Tap your name!</p><div id="kids"></div><p id="empty">Teacher: tap ⚙ Teacher to add your class!</p><button id="inst" class="pill">📲 Install app</button><div id="ioshint">On iPhone/iPad: tap Share ⬆ then “Add to Home Screen”</div><button id="tbtn" class="pill small">⚙ Teacher</button></div>
 <div id="teacher" class="scr"><h2>Teacher Settings</h2><div class="row"><input id="newk" placeholder="NEW NAME" maxlength="12" autocomplete="off"><button id="addk" class="pill">+ Add</button></div><div id="tlist"></div><div class="row"><button id="chpin" class="pill small">🔒 Change PIN</button><button id="exp" class="pill small">💾 Export class</button><button id="imp" class="pill small">📂 Import class</button><input type="file" id="impf" accept=".json,application/json" hidden></div><button id="tback" class="pill">✔ Done</button></div>
 <div id="pin" class="scr"><h2 id="ptitle"></h2><div id="pdots"></div><div id="pad"></div><div class="row"><button id="pforgot" class="pill small">Forgot PIN?</button><button id="pcancel" class="pill small del">✖ Cancel</button></div></div>
-<button id="rep" title="Hear the word" aria-label="Hear the word">🔊</button><button id="gear" title="Back to names">⚙</button><button id="pz" aria-label="Pause">⏸</button><button id="mu" aria-label="Sound">🔊</button>
+<button id="rep" title="Hear the word" aria-label="Hear the word">🔊</button><button id="gear" title="Back to names">⚙</button><button id="pz" aria-label="Pause">⏸</button><button id="mu" aria-label="Mute music &amp; sound effects (letters and words keep speaking)" title="Mute music &amp; sound effects (letters and words keep speaking)">🎵</button>
 <script>
 const c=document.getElementById('c'),x=c.getContext('2d');let W,H,S,DPR;
 function rs(){DPR=devicePixelRatio||1;W=c.width=innerWidth*DPR;H=c.height=innerHeight*DPR;S=Math.min(W/400,H/800)}addEventListener('resize',rs);rs();
@@ -45,7 +46,7 @@ function tone(f,t0,d,type,g,f2){if(muted)return;const a=A(),o=a.createOscillator
 function boing(){try{tone(300,0,.4,'sine',.3,90);tone(500,.05,.25,'triangle',.1,200)}catch(e){}}
 function ding(){try{[523,659,784].forEach((f,i)=>tone(f,i*.07,.25,'square',.08))}catch(e){}}
 function fanfare(){try{[523,659,784,1047,784,1047].forEach((f,i)=>tone(f,i*.12,.3,'square',.08))}catch(e){}}
-let sayTok=0;function say(s,raw){if(muted)return;const my=++sayTok,txt=raw?s:s.toLowerCase();try{speechSynthesis.cancel()}catch(e){}setTimeout(()=>{if(my!=sayTok)return;try{const u=new SpeechSynthesisUtterance(txt);u.lang='en-US';u.rate=.85;speechSynthesis.speak(u)}catch(e){}},40)}
+let sayTok=0;function say(s,raw){/* voice stays on even when music/SFX are muted */const my=++sayTok,txt=raw?s:s.toLowerCase();try{speechSynthesis.cancel()}catch(e){}setTimeout(()=>{if(my!=sayTok)return;try{const u=new SpeechSynthesisUtterance(txt);u.lang='en-US';u.rate=.85;speechSynthesis.speak(u)}catch(e){}},40)}
 function letterSay(ch){const l=ch.toLowerCase();return l=='a'?'a.':l}
 function setWord(w,e){word=w==name?w:w=='I'?'I':w.toLowerCase();emoji=e||'';idx=0;cars=[];sinceNeed=0;say(w)}
 const $=id=>document.getElementById(id);
@@ -137,7 +138,7 @@ for(const p of conf){p.x+=p.vx;p.y+=p.vy;p.r+=.1;x.save();x.translate(p.x,p.y);x
 }
 function pauseOverlay(){x.fillStyle='rgba(20,0,50,.55)';x.fillRect(0,0,W,H);T('Paused',W/2,H*.42,44*S,'#ffe600');T('Tap to keep going',W/2,H*.5,22*S,'#fff')}
 function togglePause(){paused=!paused;$('pz').textContent=paused?'▶':'⏸';if(paused){try{speechSynthesis.cancel()}catch(e){}pauseOverlay()}}
-function setMute(m){muted=m;localStorage.setItem('ltMute',m?'1':'0');$('mu').textContent=m?'🔇':'🔊';if(m)try{speechSynthesis.cancel()}catch(e){}}
+function setMute(m){muted=m;localStorage.setItem('ltMute',m?'1':'0');const b=$('mu');b.textContent='🎵';b.classList.toggle('off',m);const l=m?'Music & sound effects off (letters and words still speak)':'Mute music & sound effects (letters and words keep speaking)';b.title=l;b.setAttribute('aria-label',l);b.setAttribute('aria-pressed',m?'true':'false')}
 ['pointerdown','touchstart'].forEach(ev=>['pz','mu'].forEach(k=>$(k).addEventListener(ev,e=>e.stopPropagation())));
 $('pz').onclick=e=>{e.stopPropagation();if(state=='play'||state=='celeb'||paused)togglePause()};$('mu').onclick=e=>{e.stopPropagation();setMute(!muted)};setMute(muted);
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&!paused&&(state=='play'||state=='celeb'))togglePause()});
