@@ -223,4 +223,46 @@ window.__share=window.__dock={share,install,vis,tick,tapRects,SH,get last(){retu
 #palbTabs button{min-height:48px!important;font-size:16px!important}
 #palbList li{min-height:30px;height:auto!important;font-size:16px!important}
 </style>
+<!-- gamepad:start -->
+<script src="gamepad.js?v=2"></script>
+<script>
+/* Letter Traffic: the pad picks a letter car (ring follows it), A taps it */
+(function(){
+var sel=null,ring=null;
+function live(){return (state==='play'||state==='celeb')&&!paused&&!document.querySelector('#palbOv.on,#smpLock.on')}
+function carsNow(){return (window.drawn||drawn||[]).filter(function(k){return k.g&&cars.indexOf(k)>=0&&k.g.x>0&&k.g.x<W})}
+function pos(k){return {x:k.g.x/DPR,y:k.g.ly/DPR}}
+function ensureRing(){if(!ring){ring=document.createElement('div');ring.id='gp-car';ring.style.cssText='position:fixed;left:0;top:0;width:64px;height:64px;margin:-32px 0 0 -32px;border-radius:50%;border:5px solid #ffd400;box-shadow:0 0 0 3px #2a0050,0 0 18px #ffd400;pointer-events:none;z-index:2147483645;display:none';document.body.appendChild(ring)}return ring}
+function pick(dx,dy){var L=carsNow();if(!L.length){sel=null;return}
+ var o=sel&&L.indexOf(sel)>=0?pos(sel):{x:innerWidth/2,y:innerHeight*.7},best=null,bd=1e9;
+ L.forEach(function(k){if(k===sel)return;var p=pos(k),vx=p.x-o.x,vy=p.y-o.y;
+  if(dx||dy){var along=vx*dx+vy*dy;if(along<=4)return;var side=Math.abs(vx*dy-vy*dx);var d=along+side*2}else d=Math.hypot(vx,vy);
+  if(d<bd){bd=d;best=k}});
+ if(best)sel=best;else if(!sel||L.indexOf(sel)<0)sel=L[0];}
+function tap(){if(!sel||carsNow().indexOf(sel)<0)pick(0,0);if(!sel)return;var p=pos(sel),r=c.getBoundingClientRect();
+ c.dispatchEvent(new PointerEvent('pointerdown',{clientX:p.x,clientY:p.y,bubbles:true,cancelable:true,pointerType:'mouse',isPrimary:true}));}
+function d(x,y){return function(p){if(p&&live())pick(x,y)}}
+GamepadSupport.init({
+ keys:{left:d(-1,0),right:d(1,0),up:d(0,-1),down:d(0,1),
+  a:function(p){if(!p)return;if(paused){togglePause();return}if(live())tap()},
+  x:function(p){if(p&&live()&&word)say(word)},
+  y:function(p){if(p&&live()&&word)say(word)},
+  b:function(p){if(p&&paused)togglePause()},
+  start:function(p){if(p&&(state==='play'||state==='celeb'||paused))togglePause()},
+  back:function(p){if(p)setMute(!muted)}},
+ noRepeat:['a','x','y','b','start','back'],repeatDelay:260,repeatRate:200,
+ ignoreSel:'#dock,#mu,#pz,#rep,#gear,#inst,#ios,.tb,#dockHint,#dockHintX',
+ menu:function(){return !!document.querySelector('#palbOv.on,#smpLock.on')||!(state==='play'||state==='celeb');},
+ isPaused:function(){return paused},
+ pause:function(){if(!paused&&(state==='play'||state==='celeb'))togglePause()},
+ back:function(){if(document.querySelector('#palbOv.on,#smpLock.on'))return false;
+  var cancel=['pcancel','tback'].map(function(i){return document.getElementById(i)}).filter(function(e){return e&&e.offsetParent})[0];
+  if(cancel){cancel.click();return true}return true;},
+ onFrame:function(r,mode){var g=ensureRing();if(mode==='play'&&live()&&r.any){if(sel&&carsNow().indexOf(sel)<0)sel=null;if(!sel)pick(0,0);
+   if(sel){var p=pos(sel);g.style.transform='translate('+p.x+'px,'+p.y+'px)';g.style.display='block';return}}g.style.display='none'},
+ hint:{text:'🎮 Controller: D-pad or stick picks a letter car · A grabs it · X hears the word · Start pause · Select music',when:function(){return state==='setup'&&!document.querySelector('#palbOv.on,#smpLock.on')}}
+});
+})();
+</script>
+<!-- gamepad:end -->
 </body></html>
